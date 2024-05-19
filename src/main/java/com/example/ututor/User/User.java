@@ -1,4 +1,4 @@
-package com.example.ututor.model;
+package com.example.ututor.User;
 
 import jakarta.persistence.*;
 import lombok.Data;
