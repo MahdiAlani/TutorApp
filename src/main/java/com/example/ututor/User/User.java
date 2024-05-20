@@ -1,7 +1,11 @@
 package com.example.ututor.User;
 
+import com.example.ututor.Listing.Listing;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -11,23 +15,20 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
     private String username;
 
-    @Column
     private String password;
 
-    @Column
     private String email;
 
-    @Column
     private String firstName;
 
-    @Column
     private String lastName;
 
-    @Column
     private String school;
+
+    @OneToMany(mappedBy = "user")
+    private List<Listing> listings;
 
     public User() {}
 
@@ -39,5 +40,6 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.school = school;
+        this.listings = new ArrayList<>();
     }
 }
