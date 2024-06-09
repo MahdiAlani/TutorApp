@@ -1,11 +1,15 @@
 package com.example.ututor.User;
 
+import com.example.ututor.Dto.RegisterDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("api/auth")
 public class UserController {
 
     private final UserService userService;
@@ -15,25 +19,33 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<UserEntity> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable Long id) { // @PathVariable extracts id from the url
+    public UserEntity getUser(@PathVariable Long id) { // @PathVariable extracts id from the url
         return userService.getUserById(id);
     }
 
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.saveUser(user);
+    @PostMapping("/register")
+    public ResponseEntity<String> createUser(@RequestBody RegisterDto registerDto) {
+
+        UserEntity user = userService.saveUser(registerDto);
+
+        // User Created
+        if (user != null) {
+            return new ResponseEntity<>("User Created", HttpStatus.OK);
+        }
+        // User already Exists
+        return new ResponseEntity<>("User Already exists.", HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        user.setId(id);
-        return userService.saveUser(user);
+    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody RegisterDto registerDto) {
+        return null;
     }
+
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {

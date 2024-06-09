@@ -1,6 +1,5 @@
 package com.example.ututor.Listing;
 
-import com.example.ututor.User.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
@@ -14,9 +13,8 @@ public class Listing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name="tutor_id")
-    private User tutor;
+    @JoinColumn(name="tutorId")
+    private Long tutorId;
 
     private String description;
 
@@ -26,9 +24,9 @@ public class Listing {
 
     public Listing() {}
 
-    public Listing(Long id, User tutor, String description, String price_per_hour, LocalDate created_date) {
+    public Listing(Long id, Long tutorId, String description, String price_per_hour, LocalDate created_date) {
         this.id = id;
-        this.tutor = tutor;
+        this.tutorId = tutorId;
         this.description = description;
         this.price_per_hour = price_per_hour;
         this.created_date = created_date;

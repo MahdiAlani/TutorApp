@@ -1,6 +1,5 @@
 package com.example.ututor.Listing;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,7 +10,6 @@ public class ListingService {
 
     private final ListingRepository listingRepository;
 
-    @Autowired
     public ListingService(ListingRepository listingRepository) {
         this.listingRepository = listingRepository;
     }

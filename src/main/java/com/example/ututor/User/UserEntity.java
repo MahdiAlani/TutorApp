@@ -1,0 +1,80 @@
+package com.example.ututor.User;
+
+import com.example.ututor.Listing.Listing;
+import com.example.ututor.Role.Role;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Entity
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+public class UserEntity implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String fullName;
+
+    private String username;
+
+    private String password;
+
+    @OneToMany(mappedBy = "tutorId")
+    private List<Listing> listings;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private List<Role> roles = new ArrayList<>();
+
+    // Constructor with roles
+    public UserEntity(Long id, String username, String fullName, String password, List<Role> roles) {
+        this.id = id;
+        this.username = username;
+        this.fullName = fullName;
+        this.password = password;
+        this.listings = new ArrayList<>();
+        this.roles = roles;
+    }
+
+    // Constructor with roles
+    public UserEntity(Long id, String username, String fullName, String password) {
+        this(id, username, fullName, password, new ArrayList<>());
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
+}
