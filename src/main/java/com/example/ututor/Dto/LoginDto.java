@@ -3,9 +3,7 @@ package com.example.ututor.Dto;
 import lombok.Data;
 
 @Data
-public class RegisterDto {
-
-    private String fullName;
+public class LoginDto {
 
     private String username;
 

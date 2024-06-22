@@ -1,9 +1,13 @@
 package com.example.ututor.User;
 
+import com.example.ututor.Dto.AuthResponseDto;
+import com.example.ututor.Dto.LoginDto;
 import com.example.ututor.Dto.RegisterDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,6 +43,24 @@ public class UserController {
         }
         // User already Exists
         return new ResponseEntity<>("User Already exists.", HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto loginDto) {
+
+        try {
+            String token = userService.authenticateUser(loginDto);
+            return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
+
+        } catch (AuthenticationException ex) {
+            if (ex instanceof BadCredentialsException) {
+                return new ResponseEntity<>(new AuthResponseDto("Username or password is incorrect."),
+                        HttpStatus.UNAUTHORIZED);
+            } else {
+                return new ResponseEntity<>(new AuthResponseDto("An error occurred during authentication."),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
     }
 
     @PutMapping("/{id}")

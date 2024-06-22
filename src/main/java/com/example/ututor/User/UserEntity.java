@@ -1,5 +1,6 @@
 package com.example.ututor.User;
 
+import com.example.ututor.ChatSystem.Chat.Chat;
 import com.example.ututor.Listing.Listing;
 import com.example.ututor.Role.Role;
 import jakarta.persistence.*;
@@ -28,13 +29,13 @@ public class UserEntity implements UserDetails {
 
     private String password;
 
-    @OneToMany(mappedBy = "tutorId")
-    private List<Listing> listings;
-
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private List<Role> roles = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "users")
+    private List<Chat> chats = new ArrayList<>();
 
     // Constructor with roles
     public UserEntity(Long id, String username, String fullName, String password, List<Role> roles) {
@@ -42,7 +43,6 @@ public class UserEntity implements UserDetails {
         this.username = username;
         this.fullName = fullName;
         this.password = password;
-        this.listings = new ArrayList<>();
         this.roles = roles;
     }
 
@@ -60,21 +60,21 @@ public class UserEntity implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }
