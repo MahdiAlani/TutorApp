@@ -10,16 +10,27 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Objects;
 
 @Component
 public class JWTGenerator {
 
     // Secret Key
     private final SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(SecurityConstants.JWTSECRET));
-    public String generateToken(Authentication authentication) {
+    public String generateToken(Authentication authentication, String tokenType) {
+
         String username = authentication.getName();
         Date currentDate = new Date();
-        Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWTEXPIRATION);
+        Date expireDate;
+
+        // Refresh token
+        if (tokenType.equals("REFRESH")) {
+            expireDate = new Date(currentDate.getTime() + SecurityConstants.JWTEXPIRATIONREFRESH);
+        }
+        // Access token
+        else {
+            expireDate = new Date(currentDate.getTime() + SecurityConstants.JWTEXPIRATIONACCESS);
+        }
 
         return Jwts.builder()
                 .setSubject(username)

@@ -3,6 +3,7 @@ package com.example.ututor.User;
 import com.example.ututor.Dto.AuthResponseDto;
 import com.example.ututor.Dto.LoginDto;
 import com.example.ututor.Dto.RegisterDto;
+import com.example.ututor.Dto.UserDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,22 +43,20 @@ public class UserController {
             return new ResponseEntity<>("User Created", HttpStatus.OK);
         }
         // User already Exists
-        return new ResponseEntity<>("User Already exists.", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("User already exists. Please sign in.", HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto loginDto) {
-
         try {
-            String token = userService.authenticateUser(loginDto);
-            return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
+            return new ResponseEntity<>(userService.authenticateUser(loginDto), HttpStatus.OK);
 
         } catch (AuthenticationException ex) {
             if (ex instanceof BadCredentialsException) {
-                return new ResponseEntity<>(new AuthResponseDto("Username or password is incorrect."),
+                return new ResponseEntity<>(new AuthResponseDto("Email or password is incorrect.", null,null),
                         HttpStatus.UNAUTHORIZED);
             } else {
-                return new ResponseEntity<>(new AuthResponseDto("An error occurred during authentication."),
+                return new ResponseEntity<>(new AuthResponseDto("An error occurred during authentication. Please Try again", null, null),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }

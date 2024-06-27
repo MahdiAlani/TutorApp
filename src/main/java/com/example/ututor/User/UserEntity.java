@@ -1,7 +1,6 @@
 package com.example.ututor.User;
 
 import com.example.ututor.ChatSystem.Chat.Chat;
-import com.example.ututor.Listing.Listing;
 import com.example.ututor.Role.Role;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -23,7 +22,7 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String fullName;
+    private String name;
 
     private String username;
 
@@ -38,10 +37,10 @@ public class UserEntity implements UserDetails {
     private List<Chat> chats = new ArrayList<>();
 
     // Constructor with roles
-    public UserEntity(Long id, String username, String fullName, String password, List<Role> roles) {
+    public UserEntity(Long id, String username, String name, String password, List<Role> roles) {
         this.id = id;
         this.username = username;
-        this.fullName = fullName;
+        this.name = name;
         this.password = password;
         this.roles = roles;
     }
