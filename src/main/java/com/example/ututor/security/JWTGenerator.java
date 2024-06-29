@@ -17,20 +17,28 @@ public class JWTGenerator {
 
     // Secret Key
     private final SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(SecurityConstants.JWTSECRET));
-    public String generateToken(Authentication authentication, String tokenType) {
+    public String generateRefreshToken(Authentication authentication) {
 
         String username = authentication.getName();
         Date currentDate = new Date();
         Date expireDate;
 
-        // Refresh token
-        if (tokenType.equals("REFRESH")) {
-            expireDate = new Date(currentDate.getTime() + SecurityConstants.JWTEXPIRATIONREFRESH);
-        }
-        // Access token
-        else {
-            expireDate = new Date(currentDate.getTime() + SecurityConstants.JWTEXPIRATIONACCESS);
-        }
+        expireDate = new Date(currentDate.getTime() + SecurityConstants.JWTEXPIRATIONREFRESH);
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(currentDate)
+                .setExpiration(expireDate)
+                .signWith(key)
+                .compact();
+    }
+
+    public String generateAccessToken(String refreshToken, String username) {
+
+        Date currentDate = new Date();
+        Date expireDate;
+
+        expireDate = new Date(currentDate.getTime() + SecurityConstants.JWTEXPIRATIONACCESS);
 
         return Jwts.builder()
                 .setSubject(username)

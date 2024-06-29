@@ -1,13 +1,12 @@
 package com.example.ututor.User;
 
-import com.example.ututor.Dto.AuthResponseDto;
-import com.example.ututor.Dto.LoginDto;
-import com.example.ututor.Dto.RegisterDto;
-import com.example.ututor.Dto.UserDto;
+import com.example.ututor.Dto.*;
 import com.example.ututor.Role.Role;
 import com.example.ututor.Role.RoleRepository;
 import com.example.ututor.security.JWTGenerator;
+import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -81,8 +80,8 @@ public class UserService {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
 
-        String accessToken = jwtGenerator.generateToken(authentication, "ACCESS");
-        String refreshToken = jwtGenerator.generateToken(authentication, "REFRESH");
+        String refreshToken = jwtGenerator.generateRefreshToken(authentication);
+        String accessToken = jwtGenerator.generateAccessToken(refreshToken, loginDto.getEmail());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Getting the user
@@ -92,7 +91,28 @@ public class UserService {
         return new AuthResponseDto(accessToken, refreshToken, userDto);
     }
 
+    public AuthResponseDto validateTokens(String accessToken, String refreshToken) {
+
+            // Validate refresh Token, throws error if token not valid
+            jwtGenerator.validateToken(refreshToken);
+            Optional<UserEntity> user = userRepository.findByUsername(jwtGenerator.getUsernameFromJWT(accessToken));
+            UserDto userDto = convertToDto(user.get());
+
+        try { // Validate Access Token
+            jwtGenerator.validateToken(accessToken);
+            // Both Tokens valid, user is authenticated
+            return new AuthResponseDto(accessToken, refreshToken, userDto);
+        }
+        catch(Exception e) { // Access token invalid, create new one using refresh token
+            String newToken = jwtGenerator.generateAccessToken(refreshToken,
+                    jwtGenerator.getUsernameFromJWT(refreshToken));
+
+            return new AuthResponseDto(newToken, refreshToken, userDto);
+        }
+    }
+
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
 }

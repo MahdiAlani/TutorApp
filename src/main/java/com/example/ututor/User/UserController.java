@@ -1,9 +1,6 @@
 package com.example.ututor.User;
 
-import com.example.ututor.Dto.AuthResponseDto;
-import com.example.ututor.Dto.LoginDto;
-import com.example.ututor.Dto.RegisterDto;
-import com.example.ututor.Dto.UserDto;
+import com.example.ututor.Dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,6 +56,20 @@ public class UserController {
                 return new ResponseEntity<>(new AuthResponseDto("An error occurred during authentication. Please Try again", null, null),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
+        }
+    }
+
+    @PostMapping("/validateTokens")
+    public ResponseEntity<AuthResponseDto> validateTokens(@RequestBody TokenDto dto) {
+        try {
+            // Validate Both tokens
+            AuthResponseDto tokens = userService.validateTokens(dto.getAccessToken(), dto.getRefreshToken());
+
+            // Tokens valid, return them
+            return new ResponseEntity<>(tokens, HttpStatus.OK);
+        } catch (Exception e) { // Refresh Token invalid, user must sign in again
+            return new ResponseEntity<>(new AuthResponseDto("Could not Authorize, Please sign in.",
+                    null, null) ,HttpStatus.UNAUTHORIZED);
         }
     }
 
